@@ -1,91 +1,147 @@
-/* global fetch */
+/* global fetch alert */
 import React, { useState, useEffect } from 'react'
-
 import MaterialTable from 'material-table'
+import Modal from '@material-ui/core/Modal'
+import { makeStyles } from '@material-ui/core/styles'
 
-import AuthorModal from './AuthorModal'
+const useModalStyles = makeStyles(theme => ({
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    transform: 'translate(-50%, -50%)',
+    top: '50%',
+    left: '50%',
+    outline: 'none'
+  }
+}))
 
 const Authors = () => {
-  const [authors, setAuthors] = useState([])
+  const [state, setState] = useState([])
+
+  const getData = async () => {
+    const res = await fetch('/api/author')
+    const body = await res.json()
+    if (body.status !== 'success') {
+      alert(body.message)
+    }
+    setState(body.data)
+  }
 
   useEffect(() => {
-    const callApi = async () => {
-      const res = await fetch('/api/author')
-      const body = await res.json()
-      console.log(body)
-      if (body.status !== 'success') {
-        throw Error(body.message)
-      }
-      setAuthors(body.data)
-    }
-    callApi()
+    getData()
   }, [])
 
-  const [state, setState] = React.useState({
-    columns: [
-      { title: 'Name', field: 'name' },
-      { title: 'Surname', field: 'surname' },
-      { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
+  const columns = [
+    { title: 'Автор', field: 'name' },
+    { title: 'Описание', field: 'description' }
+  ]
+
+  const onRowAdd = async newData => {
+    const res = await fetch('/api/author', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newData)
+    })
+    const body = await res.json()
+    if (body.status !== 'success') {
+      alert(body.message)
+    }
+    setState(state => [
+      ...state,
+      newData
+    ])
+  }
+
+  const onRowUpdate = async (newData, oldData) => {
+    const res = await fetch(
+      `/api/author/${newData.author_id}`,
       {
-        title: 'Birth Place',
-        field: 'birthCity',
-        lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' }
-      }
-    ],
-    data: [
-      { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newData)
+      })
+    const body = await res.json()
+    if (body.status !== 'success') {
+      alert(body.message)
+    }
+    setState(state => [
+      ...state.splice(0, state.indexOf(oldData)),
+      newData,
+      ...state.splice(state.indexOf(oldData) + 1)
+    ])
+  }
+
+  const onRowDelete = async (oldData) => {
+    const res = await fetch(
+      `/api/author/${oldData.author_id}`,
       {
-        name: 'Zerya Betül',
-        surname: 'Baran',
-        birthYear: 2017,
-        birthCity: 34
-      }
-    ]
-  })
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    const body = await res.json()
+    if (body.status !== 'success') {
+      alert(body.message)
+    }
+    setState(state => [
+      ...state.splice(0, state.indexOf(oldData)),
+      ...state.splice(state.indexOf(oldData) + 1)
+    ])
+  }
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalData, setModalData] = useState({})
+
+  const classes = useModalStyles()
+
+  const handleOpen = (data) => {
+    setIsModalOpen(true)
+    setModalData(data)
+  }
+
+  const handleClose = () => {
+    setIsModalOpen(false)
+    setModalData({})
+  }
 
   return (
-    <MaterialTable
-      title='Editable Example'
-      columns={state.columns}
-      data={state.data}
-      editable={{
-        onRowAdd: newData =>
-          new Promise(resolve => {
-            setTimeout(() => {
-              resolve()
-              setState(prevState => {
-                const data = [...prevState.data]
-                data.push(newData)
-                return { ...prevState, data }
-              })
-            }, 600)
-          }),
-        onRowUpdate: (newData, oldData) =>
-          new Promise(resolve => {
-            setTimeout(() => {
-              resolve()
-              if (oldData) {
-                setState(prevState => {
-                  const data = [...prevState.data]
-                  data[data.indexOf(oldData)] = newData
-                  return { ...prevState, data }
-                })
-              }
-            }, 600)
-          }),
-        onRowDelete: oldData =>
-          new Promise(resolve => {
-            setTimeout(() => {
-              resolve()
-              setState(prevState => {
-                const data = [...prevState.data]
-                data.splice(data.indexOf(oldData), 1)
-                return { ...prevState, data }
-              })
-            }, 600)
-          })
-      }}
-    />
+    <>
+      <MaterialTable
+        title='Авторы'
+        columns={columns}
+        data={state}
+        options={{
+          minBodyHeight: '80vh'
+        }}
+        actions={[
+          {
+            icon: 'info',
+            tooltip: 'Save User',
+            onClick: (event, rowData) => handleOpen(rowData)
+          }
+        ]}
+        editable={{
+          onRowAdd,
+          onRowUpdate,
+          onRowDelete
+        }}
+      />
+      <Modal
+        open={isModalOpen}
+        onClose={handleClose}
+      >
+        <div className={classes.paper}>{modalData.name}</div>
+      </Modal>
+    </>
   )
 }
 

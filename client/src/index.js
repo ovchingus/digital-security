@@ -6,8 +6,6 @@ import { ThemeProvider } from '@material-ui/core/styles'
 import App from './App'
 import theme from './theme'
 
-import 'typeface-roboto'
-
 ReactDOM.render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
