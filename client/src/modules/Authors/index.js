@@ -125,7 +125,7 @@ const Authors = () => {
         actions={[
           {
             icon: 'info',
-            tooltip: 'Save User',
+            tooltip: 'Information',
             onClick: (event, rowData) => handleOpen(rowData)
           }
         ]}
