@@ -14,5 +14,5 @@ ReactDOM.render(
     <CssBaseline />
     <App />
   </ThemeProvider>,
-document.getElementById('root')
+  document.getElementById('root')
 )
