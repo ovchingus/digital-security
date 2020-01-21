@@ -1,25 +1,12 @@
 /* global fetch alert */
 import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import MaterialTable from 'material-table'
-import Modal from '@material-ui/core/Modal'
-import { makeStyles } from '@material-ui/core/styles'
 
-const useModalStyles = makeStyles(theme => ({
-  paper: {
-    position: 'absolute',
-    width: 400,
-    backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    transform: 'translate(-50%, -50%)',
-    top: '50%',
-    left: '50%',
-    outline: 'none'
-  }
-}))
+import { openModal, closeModal } from '../../flux/actions'
+import Modal from './AuthorsModal'
 
-const Authors = () => {
+const Authors = ({ modal, openModal }) => {
   const [state, setState] = useState([])
 
   const getData = async () => {
@@ -98,21 +85,6 @@ const Authors = () => {
     ])
   }
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalData, setModalData] = useState({})
-
-  const classes = useModalStyles()
-
-  const handleOpen = (data) => {
-    setIsModalOpen(true)
-    setModalData(data)
-  }
-
-  const handleClose = () => {
-    setIsModalOpen(false)
-    setModalData({})
-  }
-
   return (
     <>
       <MaterialTable
@@ -126,7 +98,7 @@ const Authors = () => {
           {
             icon: 'info',
             tooltip: 'Information',
-            onClick: (event, rowData) => handleOpen(rowData)
+            onClick: (event, rowData) => openModal(rowData)
           }
         ]}
         editable={{
@@ -135,14 +107,21 @@ const Authors = () => {
           onRowDelete
         }}
       />
-      <Modal
-        open={isModalOpen}
-        onClose={handleClose}
-      >
-        <div className={classes.paper}>{modalData.name}</div>
-      </Modal>
+      <Modal />
     </>
   )
 }
 
-export default Authors
+const mapStateToProps = (state) => ({
+  modal: state.modal
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  openModal: (data) => dispatch(openModal(data)),
+  closeModal: () => dispatch(closeModal())
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Authors)
