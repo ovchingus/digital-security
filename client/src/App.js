@@ -4,6 +4,7 @@ import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
 
 import Authors from './modules/Authors'
+import Books from './modules/Books'
 
 const TabPanel = ({ children, value, index }) =>
   value === index && <div>{children}</div>
@@ -28,7 +29,7 @@ const App = () => {
         </Tabs>
       </AppBar>
       <TabPanel value={currentTab} index={0}>
-        Item One
+        <Books />
       </TabPanel>
       <TabPanel value={currentTab} index={1}>
         <Authors />
