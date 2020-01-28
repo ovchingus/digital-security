@@ -9,6 +9,10 @@ function Authors ({ authors, getAuthors }) {
     getAuthors()
   }, [])
 
+  useEffect(() => {
+    setData(authors)
+  }, [authors])
+
   const [data, setData] = useState(authors)
   const [sort, setSort] = useState({ direction: null, column: null })
 
@@ -30,7 +34,16 @@ function Authors ({ authors, getAuthors }) {
   }
 
   function handleSearch (e, { value }) {
-    console.log(data)
+    const newData = []
+    for (const author of data) {
+      for (const objVal of Object.values(author)) {
+        if (_.includes(objVal, value)) {
+          newData.push(author)
+          break
+        }
+      }
+    }
+    value.length > 0 ? setData(newData) : setData(authors)
   }
 
   return (
