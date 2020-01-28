@@ -1,41 +1,50 @@
-import React, { useState } from 'react'
-import AppBar from '@material-ui/core/AppBar'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
+import React from 'react'
+import { connect } from 'react-redux'
+import { Container, Tab } from 'semantic-ui-react'
+import { changeTab } from './flux/actions'
+import Authors from './modules/Authors/index'
 
-import Authors from './modules/Authors'
-import Books from './modules/Books'
+const panes = [
+  {
+    menuItem: 'Книги',
+    render: () => <Tab.Pane attached={false}>Tab 1 Content</Tab.Pane>
+  },
+  {
+    menuItem: 'Авторы',
+    render: () => (
+      <Tab.Pane attached={false}>
+        <Authors />
+      </Tab.Pane>
+    )
+  }
+]
 
-const TabPanel = ({ children, value, index }) =>
-  value === index && <div>{children}</div>
-
-const App = () => {
-  const [currentTab, setCurrentTab] = useState(0)
-
-  const handleChange = (event, newValue) => {
-    setCurrentTab(newValue)
+function App ({ currentTab, changeTab }) {
+  function handleTabChange (e, { activeIndex }) {
+    changeTab(activeIndex)
   }
 
   return (
-    <>
-      <AppBar position='static'>
-        <Tabs
-          value={currentTab}
-          onChange={handleChange}
-          centered
-        >
-          <Tab label='Книги' />
-          <Tab label='Авторы' />
-        </Tabs>
-      </AppBar>
-      <TabPanel value={currentTab} index={0}>
-        <Books />
-      </TabPanel>
-      <TabPanel value={currentTab} index={1}>
-        <Authors />
-      </TabPanel>
-    </>
+    <Container style={{ margin: 20 }}>
+      <Tab
+        panes={panes}
+        menu={{
+          attached: false,
+          tabular: false
+        }}
+        activeIndex={currentTab}
+        onTabChange={handleTabChange}
+      />
+    </Container>
   )
 }
 
-export default App
+const mapStateToProps = state => ({
+  currentTab: state.tab
+})
+
+const mapDispatchToProps = dispatch => ({
+  changeTab: tab => dispatch(changeTab(tab))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

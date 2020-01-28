@@ -1,117 +1,115 @@
-/* global fetch alert */
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import MaterialTable from 'material-table'
+import { Table, Button, Input } from 'semantic-ui-react'
+import _ from 'lodash'
+import { getAuthors } from '../../flux/actions'
 
-import { openModal, closeModal, getAuthors } from '../../flux/actions'
-import Modal from './AuthorsModal'
-
-const Authors = ({ modal, openModal, authors, getAuthors }) => {
-  const [state, setState] = useState([])
-
+function Authors ({ authors, getAuthors }) {
   useEffect(() => {
     getAuthors()
   }, [])
 
-  const columns = [
-    { title: 'Автор', field: 'name' },
-    { title: 'Описание', field: 'description' }
-  ]
+  const [data, setData] = useState(authors)
+  const [sort, setSort] = useState({ direction: null, column: null })
 
-  const onRowAdd = async newData => {
-    const res = await fetch('/api/author', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newData)
-    })
-    const body = await res.json()
-    if (body.status !== 'success') {
-      alert(body.message)
+  const handleSort = (clickedColumn) => () => {
+    if (sort.column !== clickedColumn) {
+      setSort({
+        direction: 'ascending',
+        column: clickedColumn
+      })
+      setData(_.sortBy(data, [clickedColumn]))
+      return
     }
-    setState(state => [
-      ...state,
-      newData
-    ])
+    setData(data.reverse())
+    setSort(sort.direction === 'ascending' ? 'descending' : 'ascending')
   }
 
-  const onRowUpdate = async (newData, oldData) => {
-    const res = await fetch(
-      `/api/author/${newData.author_id}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newData)
-      })
-    const body = await res.json()
-    if (body.status !== 'success') {
-      alert(body.message)
-    }
-    setState(state => [
-      ...state.splice(0, state.indexOf(oldData)),
-      newData,
-      ...state.splice(state.indexOf(oldData) + 1)
-    ])
+  function useSort (cellName) {
+    return cellName === sort.column ? sort.direction : null
   }
 
-  const onRowDelete = async (oldData) => {
-    const res = await fetch(
-      `/api/author/${oldData.author_id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-    const body = await res.json()
-    if (body.status !== 'success') {
-      alert(body.message)
-    }
-    setState(state => [
-      ...state.splice(0, state.indexOf(oldData)),
-      ...state.splice(state.indexOf(oldData) + 1)
-    ])
+  function handleSearch (e, { value }) {
+    console.log(data)
   }
 
   return (
-    <>
-      <MaterialTable
-        title='Авторы'
-        columns={columns}
-        data={authors}
-        options={{
-          minBodyHeight: '80vh'
-        }}
-        actions={[
-          {
-            icon: 'info',
-            tooltip: 'Information',
-            onClick: (event, rowData) => openModal(rowData)
-          }
-        ]}
-        editable={{
-          onRowAdd,
-          onRowUpdate,
-          onRowDelete
-        }}
-      />
-      <Modal />
-    </>
+    <div>
+      <Table sortable striped>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell colSpan='3'>
+              <Button
+                floated='right'
+                primary
+                size='small'
+              >
+                Добавить автора
+              </Button>
+              <Input
+                icon='search'
+                placeholder='Поиск...'
+                onChange={handleSearch}
+              />
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Действия</Table.HeaderCell>
+            <Table.HeaderCell
+              sorted={useSort('author')}
+              onClick={handleSort('author')}
+            >
+              Автор
+            </Table.HeaderCell>
+            <Table.HeaderCell
+              sorted={useSort('description')}
+              onClick={handleSort('description')}
+            >
+              Описание
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {data.map(({ author_id: id, name, description }) => (
+            <Table.Row key={id}>
+              <Table.Cell collapsing>
+                <Button.Group basic size='small'>
+                  <Button icon='edit' alt='Редактировать' />
+                  <Button icon='remove' alt='Удалить' />
+                </Button.Group>
+              </Table.Cell>
+              <Table.Cell>{name}</Table.Cell>
+              <Table.Cell>{description}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+        {/* <Table.Footer>
+          <Table.Row>
+            <Table.HeaderCell />
+            <Table.HeaderCell colSpan='3'>
+              <Button
+                floated='right'
+                primary
+                size='small'
+              >
+                Добавить автора
+              </Button>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer> */}
+      </Table>
+    </div>
   )
 }
 
-const mapStateToProps = (state) => ({
-  modal: state.modal,
+const mapStateToProps = state => ({
   authors: state.authors
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  getAuthors: () => dispatch(getAuthors()),
-  openModal: (data) => dispatch(openModal(data)),
-  closeModal: () => dispatch(closeModal())
+const mapDispatchToProps = dispatch => ({
+  getAuthors: () => dispatch(getAuthors())
 })
 
 export default connect(

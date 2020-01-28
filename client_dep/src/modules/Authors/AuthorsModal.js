@@ -11,7 +11,7 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 
-import { closeModal } from '../../flux/actions'
+import { closeModal } from '../../../../client/src/modules/Authors/flux/actions'
 
 const useStyles = makeStyles({
   card: {

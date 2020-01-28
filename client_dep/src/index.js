@@ -4,12 +4,16 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import './index.css'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import { ThemeProvider } from '@material-ui/core/styles'
+
 import App from './App'
-import { tab, authors } from './flux/reducers'
+import theme from './theme'
+import { tab, modal, authors } from '../../client/src/modules/Authors/flux/reducers'
 
 const appReducer = combineReducers({
   tab,
+  modal,
   authors
 })
 
@@ -17,15 +21,12 @@ const store = createStore(appReducer, composeWithDevTools(
   applyMiddleware(thunk)
 ))
 
-// TODO: Switch to https://github.com/palmerhq/the-platform#stylesheet when it will be stable
-const styleLink = document.createElement('link')
-styleLink.rel = 'stylesheet'
-styleLink.href = 'https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css'
-document.head.appendChild(styleLink)
-
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
   </Provider>,
   document.getElementById('root')
 )
