@@ -6,11 +6,12 @@ import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import './index.css'
 import App from './App'
-import { tab, authors } from './flux/reducers'
+import { tab, authors, modal } from './flux/reducers'
 
 const appReducer = combineReducers({
   tab,
-  authors
+  authors,
+  modal
 })
 
 const store = createStore(appReducer, composeWithDevTools(

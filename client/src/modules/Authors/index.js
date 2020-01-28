@@ -2,9 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Table, Button, Input } from 'semantic-ui-react'
 import _ from 'lodash'
-import { getAuthors } from '../../flux/actions'
+import { getAuthors, deleteAuthor } from '../../flux/actions'
+import ModalInfo from './modal/Info'
+import ModalAdd from './modal/Add'
+import ModalEdit from './modal/Edit'
 
-function Authors ({ authors, getAuthors }) {
+function Authors ({
+  authors,
+  getAuthors,
+  deleteAuthor
+}) {
   useEffect(() => {
     getAuthors()
   }, [])
@@ -48,17 +55,11 @@ function Authors ({ authors, getAuthors }) {
 
   return (
     <div>
-      <Table sortable striped>
+      <Table sortable striped celled selectable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell colSpan='3'>
-              <Button
-                floated='right'
-                primary
-                size='small'
-              >
-                Добавить автора
-              </Button>
+              <ModalAdd />
               <Input
                 icon='search'
                 placeholder='Поиск...'
@@ -85,33 +86,27 @@ function Authors ({ authors, getAuthors }) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.map(({ author_id: id, name, description }) => (
-            <Table.Row key={id}>
+          {data.map(author => (
+            <Table.Row key={author.author_id}>
               <Table.Cell collapsing>
-                <Button.Group basic size='small'>
-                  <Button icon='edit' alt='Редактировать' />
-                  <Button icon='remove' alt='Удалить' />
-                </Button.Group>
+                <ModalEdit
+                  oldData={author}
+                />
+                <Button
+                  icon='remove'
+                  alt='Удалить'
+                  onClick={() => deleteAuthor(author)}
+                />
               </Table.Cell>
-              <Table.Cell>{name}</Table.Cell>
-              <Table.Cell>{description}</Table.Cell>
+              <Table.Cell selectable>
+                <ModalInfo data={author} />
+              </Table.Cell>
+              <Table.Cell selectable>
+                <ModalInfo data={author} />
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
-        {/* <Table.Footer>
-          <Table.Row>
-            <Table.HeaderCell />
-            <Table.HeaderCell colSpan='3'>
-              <Button
-                floated='right'
-                primary
-                size='small'
-              >
-                Добавить автора
-              </Button>
-            </Table.HeaderCell>
-          </Table.Row>
-        </Table.Footer> */}
       </Table>
     </div>
   )
@@ -122,7 +117,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getAuthors: () => dispatch(getAuthors())
+  getAuthors: () => dispatch(getAuthors()),
+  deleteAuthor: (author) => dispatch(deleteAuthor(author))
 })
 
 export default connect(
