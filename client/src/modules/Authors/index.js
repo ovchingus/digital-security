@@ -3,23 +3,14 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import MaterialTable from 'material-table'
 
-import { openModal, closeModal } from '../../flux/actions'
+import { openModal, closeModal, getAuthors } from '../../flux/actions'
 import Modal from './AuthorsModal'
 
-const Authors = ({ modal, openModal }) => {
+const Authors = ({ modal, openModal, authors, getAuthors }) => {
   const [state, setState] = useState([])
 
-  const getData = async () => {
-    const res = await fetch('/api/author')
-    const body = await res.json()
-    if (body.status !== 'success') {
-      alert(body.message)
-    }
-    setState(body.data)
-  }
-
   useEffect(() => {
-    getData()
+    getAuthors()
   }, [])
 
   const columns = [
@@ -90,7 +81,7 @@ const Authors = ({ modal, openModal }) => {
       <MaterialTable
         title='Авторы'
         columns={columns}
-        data={state}
+        data={authors}
         options={{
           minBodyHeight: '80vh'
         }}
@@ -113,10 +104,12 @@ const Authors = ({ modal, openModal }) => {
 }
 
 const mapStateToProps = (state) => ({
-  modal: state.modal
+  modal: state.modal,
+  authors: state.authors
 })
 
 const mapDispatchToProps = (dispatch) => ({
+  getAuthors: () => dispatch(getAuthors()),
   openModal: (data) => dispatch(openModal(data)),
   closeModal: () => dispatch(closeModal())
 })
