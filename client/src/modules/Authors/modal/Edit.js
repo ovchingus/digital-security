@@ -8,8 +8,8 @@ const Edit = ({ text, updateAuthor, oldData }) => {
 
   const [state, setState] = useState({
     ...oldData,
-    name: oldData && oldData.name || '',
-    description: oldData && oldData.description || ''
+    name: oldData ? oldData.name : '',
+    description: oldData ? oldData.description : ''
   })
 
   function handleChange (e, { value, name }) {

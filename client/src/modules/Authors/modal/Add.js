@@ -20,6 +20,10 @@ const Add = ({ text, createAuthor, closeModal, ...props }) => {
   function handleSubmit () {
     createAuthor(state)
     setIsOpen(false)
+    setState({
+      name: '',
+      description: ''
+    })
   }
 
   function handleClose () {

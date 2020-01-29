@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { Button, Header, Icon, List, Modal } from 'semantic-ui-react'
+import { Button, Header, Icon, Modal, Rating } from 'semantic-ui-react'
 import { closeModal, openModal } from '../../../flux/actions'
 
-function Info ({ modal, data }) {
+function Info ({ modal, book }) {
   const [isOpen, setIsOpen] = useState(false)
 
   function handleClose () {
@@ -21,23 +21,25 @@ function Info ({ modal, data }) {
       onClose={handleClose}
       size='small'
     >
-      <Modal.Header>Информация о авторе</Modal.Header>
+      <Modal.Header>Информация о книге</Modal.Header>
       <Modal.Content scrolling>
-        <Header>Имя автора</Header>
-        <p>{data.name}</p>
+        <Header>Название</Header>
+        <p>{book.title}</p>
+        <Header>Автор</Header>
+        <p>{book.author.name}</p>
         <Header>Описание</Header>
-        <p>{data.description}</p>
-        <Header>ID автора</Header>
-        <p>{data.author_id}</p>
-        <Header>Список написанных книг</Header>
-        <List divided verticalAlign='middle'>
-          <List.Item>
-            <List.Content floated='right'>
-              <Button>Просмотр</Button>
-            </List.Content>
-            <List.Content>Книга</List.Content>
-          </List.Item>
-        </List>
+        <p>{book.description}</p>
+        <Header>Жанр</Header>
+        <p>{book.genre}</p>
+        <Header>Рейтинг</Header>
+        <Rating
+          disabled
+          icon='star'
+          rating={book.rating}
+          maxRating={5}
+        />
+        <Header>ID книги</Header>
+        <p>{book.book_id}</p>
       </Modal.Content>
       <Modal.Actions>
         <Button color='red' onClick={handleClose} inverted>
@@ -49,7 +51,9 @@ function Info ({ modal, data }) {
   )
 }
 
-// const mapStateToProps = (state) => ({})
+// const mapStateToProps = (state) => ({
+//   modal: state.modal
+// })
 
 // const mapDispatchToProps = (dispatch) => ({
 //   handleOpen: (variant) => dispatch(openModal(variant)),
@@ -57,5 +61,4 @@ function Info ({ modal, data }) {
 // })
 
 // export default connect(mapStateToProps, mapDispatchToProps)(Info)
-
 export default Info

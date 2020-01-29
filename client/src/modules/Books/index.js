@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Table, Button, Input } from 'semantic-ui-react'
+import { Table, Button, Input, Rating } from 'semantic-ui-react'
 import _ from 'lodash'
-import { deleteAuthor } from '../../flux/actions'
+import { deleteBook } from '../../flux/actions'
 import ModalInfo from './modal/Info'
 import ModalAdd from './modal/Add'
-import ModalEdit from './modal/Edit'
+// import ModalEdit from './modal/Edit'
 
-function Authors ({
-  authors,
-  getAuthors,
-  deleteAuthor
+function Books ({
+  books,
+  deleteBook
 }) {
   useEffect(() => {
-    setData(authors)
-  }, [authors])
+    setData(books)
+  }, [books])
 
-  const [data, setData] = useState(authors)
+  const [data, setData] = useState(books)
   const [sort, setSort] = useState({ direction: null, column: null })
 
   const handleSort = (clickedColumn) => () => {
@@ -38,15 +37,15 @@ function Authors ({
 
   function handleSearch (e, { value }) {
     const newData = []
-    for (const author of data) {
-      for (const objVal of Object.values(author)) {
+    for (const book of data) {
+      for (const objVal of Object.values(book)) {
         if (_.includes(objVal, value)) {
-          newData.push(author)
+          newData.push(book)
           break
         }
       }
     }
-    value.length > 0 ? setData(newData) : setData(authors)
+    value.length > 0 ? setData(newData) : setData(books)
   }
 
   return (
@@ -54,7 +53,7 @@ function Authors ({
       <Table sortable striped celled selectable>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell colSpan='3'>
+            <Table.HeaderCell colSpan='5'>
               <ModalAdd />
               <Input
                 icon='search'
@@ -68,36 +67,61 @@ function Authors ({
           <Table.Row>
             <Table.HeaderCell>Действия</Table.HeaderCell>
             <Table.HeaderCell
+              sorted={useSort('book')}
+              onClick={handleSort('book')}
+            >
+              Название
+            </Table.HeaderCell>
+            <Table.HeaderCell
               sorted={useSort('author')}
               onClick={handleSort('author')}
             >
               Автор
             </Table.HeaderCell>
             <Table.HeaderCell
-              sorted={useSort('description')}
-              onClick={handleSort('description')}
+              sorted={useSort('genre')}
+              onClick={handleSort('genre')}
             >
-              Описание
+              Жанр
+            </Table.HeaderCell>
+            <Table.HeaderCell
+              sorted={useSort('rating')}
+              onClick={handleSort('rating')}
+            >
+              Рейтинг
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.map(author => (
-            <Table.Row key={author.author_id}>
+          {data.map(book => (
+            <Table.Row key={book.book_id}>
               <Table.Cell collapsing>
                 <Button
                   icon='remove'
                   alt='Удалить'
-                  onClick={() => deleteAuthor(author)}
+                  onClick={() => deleteBook(book)}
                 />
-                <ModalEdit oldData={author} />
-                <ModalInfo data={author} />
+                {/* <ModalEdit
+                  oldData={book}
+                /> */}
+                <ModalInfo book={book} />
               </Table.Cell>
               <Table.Cell>
-                {author.name}
+                {book.title}
               </Table.Cell>
               <Table.Cell>
-                {author.description}
+                {book.author.name}
+              </Table.Cell>
+              <Table.Cell>
+                {book.genre}
+              </Table.Cell>
+              <Table.Cell collapsing>
+                <Rating
+                  disabled
+                  icon='star'
+                  rating={book.rating}
+                  maxRating={5}
+                />
               </Table.Cell>
             </Table.Row>
           ))}
@@ -108,14 +132,14 @@ function Authors ({
 }
 
 const mapStateToProps = state => ({
-  authors: state.authors
+  books: state.books
 })
 
 const mapDispatchToProps = dispatch => ({
-  deleteAuthor: (author) => dispatch(deleteAuthor(author))
+  deleteBook: (book) => dispatch(deleteBook(book))
 })
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Authors)
+)(Books)
