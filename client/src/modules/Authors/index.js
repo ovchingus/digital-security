@@ -3,9 +3,7 @@ import { connect } from 'react-redux'
 import { Table, Button, Input } from 'semantic-ui-react'
 import _ from 'lodash'
 import { deleteAuthor } from '../../flux/actions'
-import ModalInfo from './modal/Info'
-import ModalAdd from './modal/Add'
-import ModalEdit from './modal/Edit'
+import Modal from '../Modals'
 
 function Authors ({
   authors,
@@ -55,7 +53,7 @@ function Authors ({
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell colSpan='3'>
-              <ModalAdd />
+              <Modal.AddAuthor />
               <Input
                 icon='search'
                 placeholder='Поиск...'
@@ -90,8 +88,8 @@ function Authors ({
                   alt='Удалить'
                   onClick={() => deleteAuthor(author)}
                 />
-                <ModalEdit oldData={author} />
-                <ModalInfo data={author} />
+                <Modal.EditAuthor oldData={author} />
+                <Modal.InfoAuthor author={author} />
               </Table.Cell>
               <Table.Cell>
                 {author.name}

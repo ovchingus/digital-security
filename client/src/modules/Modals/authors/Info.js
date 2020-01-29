@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Header, Icon, List, Modal } from 'semantic-ui-react'
-import { closeModal, openModal } from '../../../flux/actions'
+import { getAuthorBooks } from '../../../flux/actions'
 
-function Info ({ modal, data }) {
+function Info ({ modal, author, getAuthorBooks }) {
   const [isOpen, setIsOpen] = useState(false)
 
   function handleClose () {
@@ -12,6 +12,7 @@ function Info ({ modal, data }) {
 
   function handleOpen () {
     setIsOpen(true)
+    getAuthorBooks(author)
   }
 
   return (
@@ -24,19 +25,21 @@ function Info ({ modal, data }) {
       <Modal.Header>Информация о авторе</Modal.Header>
       <Modal.Content scrolling>
         <Header>Имя автора</Header>
-        <p>{data.name}</p>
+        <p>{author.name}</p>
         <Header>Описание</Header>
-        <p>{data.description}</p>
+        <p>{author.description}</p>
         <Header>ID автора</Header>
-        <p>{data.author_id}</p>
+        <p>{author.author_id}</p>
         <Header>Список написанных книг</Header>
         <List divided verticalAlign='middle'>
-          <List.Item>
-            <List.Content floated='right'>
-              <Button>Просмотр</Button>
-            </List.Content>
-            <List.Content>Книга</List.Content>
-          </List.Item>
+          {modal.books.map(book => (
+            <List.Item key={book.book_id}>
+              <List.Content floated='right'>
+                <Button>Просмотр</Button>
+              </List.Content>
+              <List.Content>{book.title}</List.Content>
+            </List.Item>
+          ))}
         </List>
       </Modal.Content>
       <Modal.Actions>
@@ -49,13 +52,15 @@ function Info ({ modal, data }) {
   )
 }
 
-// const mapStateToProps = (state) => ({})
+const mapStateToProps = (state) => ({
+  modal: state.modal
+})
 
-// const mapDispatchToProps = (dispatch) => ({
-//   handleOpen: (variant) => dispatch(openModal(variant)),
-//   handleClose: () => dispatch(closeModal())
-// })
+const mapDispatchToProps = (dispatch) => ({
+  getAuthorBooks: (author) => dispatch(getAuthorBooks(author))
+})
 
-// export default connect(mapStateToProps, mapDispatchToProps)(Info)
-
-export default Info
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Info)

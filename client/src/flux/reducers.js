@@ -1,5 +1,6 @@
 import {
   CHANGE_TAB,
+  GET_AUTHOR_BOOKS,
   GET_AUTHORS,
   CREATE_AUTHOR,
   UPDATE_AUTHOR,
@@ -14,6 +15,25 @@ export function tab (state = 0, action) {
   switch (action.type) {
     case CHANGE_TAB:
       return action.tab
+    default:
+      return state
+  }
+}
+
+const initialStateModal = {
+  author: null,
+  books: []
+}
+
+export function modal (state = initialStateModal, action) {
+  switch (action.type) {
+    case GET_AUTHOR_BOOKS:
+      return {
+        author: action.author,
+        books: [
+          ...action.books
+        ]
+      }
     default:
       return state
   }

@@ -47,30 +47,24 @@ const Add = ({ text, createAuthor, closeModal, ...props }) => {
       <Modal.Header>Добавление автора</Modal.Header>
       <Modal.Content>
         <Modal.Description>
-          <Form>
-            <Form.Field>
-              <label>Имя</label>
-              <Form.Input
-                placeholder='Имя'
-                name='name'
-                value={state.name}
-                onChange={handleChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>Описание</label>
-              <Form.Input
-                placeholder='Описание'
-                name='description'
-                value={state.description}
-                onChange={handleChange}
-              />
-            </Form.Field>
-            <Button
-              type='submit'
-              onClick={handleSubmit}
-            >Добавить
-            </Button>
+          <Form onSubmit={handleSubmit}>
+            <Form.Input
+              placeholder='Имя'
+              label='Имя'
+              name='name'
+              value={state.name}
+              onChange={handleChange}
+            />
+            <Form.Input
+              placeholder='Описание'
+              label='Описание'
+              name='description'
+              value={state.description}
+              onChange={handleChange}
+            />
+            <Form.Button
+              content='Добавить'
+            />
           </Form>
         </Modal.Description>
       </Modal.Content>
@@ -86,4 +80,7 @@ const mapDispatchToProps = dispatch => ({
   createAuthor: author => dispatch(createAuthor(author))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Add)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Add)

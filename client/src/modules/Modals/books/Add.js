@@ -82,7 +82,7 @@ const Add = ({ text, trigger, createBook, closeModal, authors, ...props }) => {
                 label='Название книги'
                 placeholder='Название'
                 name='title'
-                value={state.name}
+                value={state.title}
                 onChange={handleChange}
               />
               <Form.Select

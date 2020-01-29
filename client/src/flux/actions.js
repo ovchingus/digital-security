@@ -4,10 +4,35 @@
  */
 export const CHANGE_TAB = 'CHANGE_TAB'
 
-export const changeTab = (tab) => ({
+export const changeTab = tab => ({
   type: CHANGE_TAB,
   tab
 })
+
+export const GET_AUTHOR_BOOKS = 'GET_AUTHOR_BOOKS'
+
+const _getAuthorBooks = (author, books) => ({
+  type: GET_AUTHOR_BOOKS,
+  author,
+  books
+})
+
+// TODO: нужен метод api для получения книг по автору
+export const getAuthorBooks = (author) => async (dispatch) => {
+  const res = await fetch('/api/book')
+  const body = await res.json()
+  if (body.status !== 'success') {
+    alert(body.message)
+  }
+  if (body.message === 'No Book found') {
+    dispatch(_getAuthorBooks(author, []))
+  } else {
+    const books = body.data.filter(
+      book => book.author_id === author.author_id
+    )
+    dispatch(_getAuthorBooks(author, books))
+  }
+}
 
 /**
  * Author actions && thunks
@@ -33,7 +58,7 @@ const _deleteAuthor = data => ({
   data
 })
 
-const _updateAuthor = (newData, oldData) => ({
+const _updateAuthor = (oldData, newData) => ({
   type: UPDATE_AUTHOR,
   newData,
   oldData
@@ -83,7 +108,7 @@ export const deleteAuthor = (oldData) => async dispatch => {
   dispatch(_deleteAuthor(oldData))
 }
 
-export const updateAuthor = (newData, oldData) => async dispatch => {
+export const updateAuthor = (oldData, newData) => async dispatch => {
   const res = await fetch(
     `/api/author/${newData.author_id}`,
     {
@@ -97,7 +122,7 @@ export const updateAuthor = (newData, oldData) => async dispatch => {
   if (body.status !== 'success') {
     alert(body.message)
   }
-  dispatch(_updateAuthor(newData, oldData))
+  dispatch(_updateAuthor(oldData, newData))
 }
 
 /**
@@ -124,7 +149,7 @@ const _deleteBook = data => ({
   data
 })
 
-const _updateBook = (newData, oldData) => ({
+const _updateBook = (oldData, newData) => ({
   type: UPDATE_BOOK,
   newData,
   oldData
@@ -139,7 +164,7 @@ export const getBooks = () => async (dispatch) => {
   if (body.message === 'No Book found') {
     dispatch(_getBooks([]))
   } else {
-    dispatch(_getBooks(body.data || []))
+    dispatch(_getBooks(body.data))
   }
 }
 
@@ -180,7 +205,7 @@ export const deleteBook = (oldData) => async dispatch => {
   dispatch(_deleteBook(oldData))
 }
 
-export const updateBook = (newData, oldData) => async dispatch => {
+export const updateBook = (oldData, newData) => async dispatch => {
   const res = await fetch(
     `/api/book/${newData.book_id}`,
     {
@@ -194,5 +219,5 @@ export const updateBook = (newData, oldData) => async dispatch => {
   if (body.status !== 'success') {
     alert(body.message)
   }
-  dispatch(_updateBook(newData, oldData))
+  dispatch(_updateBook(oldData, newData))
 }

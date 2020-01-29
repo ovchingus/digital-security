@@ -3,9 +3,7 @@ import { connect } from 'react-redux'
 import { Table, Button, Input, Rating } from 'semantic-ui-react'
 import _ from 'lodash'
 import { deleteBook } from '../../flux/actions'
-import ModalInfo from './modal/Info'
-import ModalAdd from './modal/Add'
-// import ModalEdit from './modal/Edit'
+import Modal from '../Modals'
 
 function Books ({
   books,
@@ -54,7 +52,7 @@ function Books ({
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell colSpan='5'>
-              <ModalAdd />
+              <Modal.AddBook />
               <Input
                 icon='search'
                 placeholder='Поиск...'
@@ -101,10 +99,8 @@ function Books ({
                   alt='Удалить'
                   onClick={() => deleteBook(book)}
                 />
-                {/* <ModalEdit
-                  oldData={book}
-                /> */}
-                <ModalInfo book={book} />
+                <Modal.EditBook oldData={book} />
+                <Modal.InfoBook book={book} />
               </Table.Cell>
               <Table.Cell>
                 {book.title}

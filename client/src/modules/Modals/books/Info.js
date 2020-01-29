@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
 import { Button, Header, Icon, Modal, Rating } from 'semantic-ui-react'
-import { closeModal, openModal } from '../../../flux/actions'
 
 function Info ({ modal, book }) {
   const [isOpen, setIsOpen] = useState(false)
