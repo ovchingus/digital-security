@@ -12,6 +12,9 @@ function Info ({ modal, book }) {
     setIsOpen(true)
   }
 
+  function handleAuthorRedirect () {
+  }
+
   return (
     <Modal
       trigger={<Button icon='info' onClick={handleOpen} />}
@@ -25,6 +28,7 @@ function Info ({ modal, book }) {
         <p>{book.title}</p>
         <Header>Автор</Header>
         <p>{book.author.name}</p>
+        <Button onClick={handleAuthorRedirect}>Подробнее</Button>
         <Header>Описание</Header>
         <p>{book.description}</p>
         <Header>Жанр</Header>

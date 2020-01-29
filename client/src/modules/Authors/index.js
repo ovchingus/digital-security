@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef, createRef } from 'react'
 import { connect } from 'react-redux'
 import { Table, Button, Input } from 'semantic-ui-react'
 import _ from 'lodash'
@@ -47,9 +47,11 @@ function Authors ({
     value.length > 0 ? setData(newData) : setData(authors)
   }
 
+  const elementsRef = useRef(data.map(() => createRef()))
+  console.log(elementsRef)
   return (
     <div>
-      <Table sortable striped celled selectable>
+      <Table sortable striped celled selectable ref={elementsRef.current[0]}>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell colSpan='3'>
@@ -80,8 +82,8 @@ function Authors ({
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.map(author => (
-            <Table.Row key={author.author_id}>
+          {data.map((author, idx) => (
+            <Table.Row ref={elementsRef[idx]} key={author.author_id}>
               <Table.Cell collapsing>
                 <Button
                   icon='remove'

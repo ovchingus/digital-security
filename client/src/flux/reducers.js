@@ -1,6 +1,7 @@
 import {
   CHANGE_TAB,
   GET_AUTHOR_BOOKS,
+  CLEAR_AUTHOR_BOOKS,
   GET_AUTHORS,
   CREATE_AUTHOR,
   UPDATE_AUTHOR,
@@ -34,6 +35,8 @@ export function modal (state = initialStateModal, action) {
           ...action.books
         ]
       }
+    case CLEAR_AUTHOR_BOOKS:
+      return initialStateModal
     default:
       return state
   }

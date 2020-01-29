@@ -10,11 +10,16 @@ export const changeTab = tab => ({
 })
 
 export const GET_AUTHOR_BOOKS = 'GET_AUTHOR_BOOKS'
+export const CLEAR_AUTHOR_BOOKS = 'CLEAR_AUTHOR_BOOKS'
 
 const _getAuthorBooks = (author, books) => ({
   type: GET_AUTHOR_BOOKS,
   author,
   books
+})
+
+export const clearAuthorBooks = () => ({
+  type: CLEAR_AUTHOR_BOOKS
 })
 
 // TODO: нужен метод api для получения книг по автору

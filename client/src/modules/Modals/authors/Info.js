@@ -1,18 +1,19 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Header, Icon, List, Modal } from 'semantic-ui-react'
-import { getAuthorBooks } from '../../../flux/actions'
+import { getAuthorBooks, clearAuthorBooks } from '../../../flux/actions'
 
-function Info ({ modal, author, getAuthorBooks }) {
+function Info ({ modal, author, getAuthorBooks, clearAuthorBooks }) {
   const [isOpen, setIsOpen] = useState(false)
 
   function handleClose () {
     setIsOpen(false)
+    clearAuthorBooks()
   }
 
   function handleOpen () {
-    setIsOpen(true)
     getAuthorBooks(author)
+    setIsOpen(true)
   }
 
   return (
@@ -57,7 +58,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  getAuthorBooks: (author) => dispatch(getAuthorBooks(author))
+  getAuthorBooks: (author) => dispatch(getAuthorBooks(author)),
+  clearAuthorBooks: () => dispatch(clearAuthorBooks())
 })
 
 export default connect(
