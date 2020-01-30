@@ -1,18 +1,27 @@
-import React, { useEffect, useState, useRef, createRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Table, Button, Input } from 'semantic-ui-react'
-import _ from 'lodash'
+import sortBy from 'lodash/sortBy'
+import includes from 'lodash/includes'
+import omit from 'lodash/omit'
 import { deleteAuthor } from '../../flux/actions'
 import Modal from '../Modals'
 
 function Authors ({
   authors,
   getAuthors,
-  deleteAuthor
+  deleteAuthor,
+  initialSearchQuery
 }) {
   useEffect(() => {
     setData(authors)
   }, [authors])
+
+  useEffect(() => {
+    if (initialSearchQuery !== '') {
+      handleSearch()
+    }
+  }, [])
 
   const [data, setData] = useState(authors)
   const [sort, setSort] = useState({ direction: null, column: null })
@@ -23,7 +32,7 @@ function Authors ({
         direction: 'ascending',
         column: clickedColumn
       })
-      setData(_.sortBy(data, [clickedColumn]))
+      setData(sortBy(data, [clickedColumn]))
       return
     }
     setData(data.reverse())
@@ -34,32 +43,37 @@ function Authors ({
     return cellName === sort.column ? sort.direction : null
   }
 
-  function handleSearch (e, { value }) {
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+
+  function handleSearch () {
     const newData = []
     for (const author of data) {
-      for (const objVal of Object.values(author)) {
-        if (_.includes(objVal, value)) {
+      const validFields = omit(author, 'author_id')
+      for (const objVal of Object.values(validFields)) {
+        if (includes(objVal.toLowerCase(), searchQuery.toLowerCase())) {
           newData.push(author)
           break
         }
       }
     }
-    value.length > 0 ? setData(newData) : setData(authors)
+    searchQuery.length > 0 ? setData(newData) : setData(authors)
   }
 
-  const elementsRef = useRef(data.map(() => createRef()))
-  console.log(elementsRef)
   return (
     <div>
-      <Table sortable striped celled selectable ref={elementsRef.current[0]}>
+      <Table sortable striped celled selectable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell colSpan='3'>
               <Modal.AddAuthor />
               <Input
-                icon='search'
+                action={{
+                  icon: 'search',
+                  onClick: () => handleSearch()
+                }}
                 placeholder='Поиск...'
-                onChange={handleSearch}
+                value={searchQuery}
+                onChange={(e, { value }) => setSearchQuery(value)}
               />
             </Table.HeaderCell>
           </Table.Row>
@@ -83,7 +97,7 @@ function Authors ({
         </Table.Header>
         <Table.Body>
           {data.map((author, idx) => (
-            <Table.Row ref={elementsRef[idx]} key={author.author_id}>
+            <Table.Row key={author.author_id}>
               <Table.Cell collapsing>
                 <Button
                   icon='remove'
@@ -108,7 +122,8 @@ function Authors ({
 }
 
 const mapStateToProps = state => ({
-  authors: state.authors
+  authors: state.authors,
+  initialSearchQuery: state.tabs.searchQuery
 })
 
 const mapDispatchToProps = dispatch => ({

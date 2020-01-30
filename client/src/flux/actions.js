@@ -3,10 +3,22 @@
  * Actions
  */
 export const CHANGE_TAB = 'CHANGE_TAB'
+export const CHANGE_SEARCH_QUERY = 'CHANGE_SEQRCH_QUERY'
+export const CHANGE_PAGE = 'CHANGE_PAGE'
 
 export const changeTab = tab => ({
   type: CHANGE_TAB,
   tab
+})
+
+export const changeSearchQuery = searchQuery => ({
+  type: CHANGE_SEARCH_QUERY,
+  searchQuery
+})
+
+export const changePage = page => ({
+  type: CHANGE_PAGE,
+  page
 })
 
 export const GET_AUTHOR_BOOKS = 'GET_AUTHOR_BOOKS'

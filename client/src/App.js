@@ -50,7 +50,7 @@ function App ({ currentTab, changeTab, getAuthors, getBooks }) {
 }
 
 const mapStateToProps = state => ({
-  currentTab: state.tab
+  currentTab: state.tabs.tab
 })
 
 const mapDispatchToProps = dispatch => ({

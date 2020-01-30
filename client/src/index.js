@@ -6,10 +6,10 @@ import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import './index.css'
 import App from './App'
-import { tab, authors, books, modal } from './flux/reducers'
+import { tabs, authors, books, modal } from './flux/reducers'
 
 const appReducer = combineReducers({
-  tab,
+  tabs,
   authors,
   books,
   modal

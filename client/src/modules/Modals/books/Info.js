@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
+import { connect } from 'react-redux'
 import { Button, Header, Icon, Modal, Rating } from 'semantic-ui-react'
+import { changeTab, changeSearchQuery } from '../../../flux/actions'
 
-function Info ({ modal, book }) {
+function Info ({ modal, book, moveToAuthorsTab, setAuthorsSearchQuery }) {
   const [isOpen, setIsOpen] = useState(false)
 
   function handleClose () {
@@ -13,6 +15,9 @@ function Info ({ modal, book }) {
   }
 
   function handleAuthorRedirect () {
+    setIsOpen(false)
+    moveToAuthorsTab()
+    setAuthorsSearchQuery(book.author.name)
   }
 
   return (
@@ -53,14 +58,13 @@ function Info ({ modal, book }) {
   )
 }
 
-// const mapStateToProps = (state) => ({
-//   modal: state.modal
-// })
+const mapStateToProps = (state) => ({
+  tab: state.tabs.tab
+})
 
-// const mapDispatchToProps = (dispatch) => ({
-//   handleOpen: (variant) => dispatch(openModal(variant)),
-//   handleClose: () => dispatch(closeModal())
-// })
+const mapDispatchToProps = (dispatch) => ({
+  moveToAuthorsTab: () => dispatch(changeTab(1)),
+  setAuthorsSearchQuery: (query) => dispatch(changeSearchQuery(query))
+})
 
-// export default connect(mapStateToProps, mapDispatchToProps)(Info)
-export default Info
+export default connect(mapStateToProps, mapDispatchToProps)(Info)

@@ -1,5 +1,7 @@
 import {
   CHANGE_TAB,
+  CHANGE_SEARCH_QUERY,
+  CHANGE_PAGE,
   GET_AUTHOR_BOOKS,
   CLEAR_AUTHOR_BOOKS,
   GET_AUTHORS,
@@ -12,10 +14,30 @@ import {
   DELETE_BOOK
 } from './actions'
 
-export function tab (state = 0, action) {
+const initialStateTabs = {
+  tab: 0,
+  page: 1,
+  searchQuery: ''
+}
+
+export function tabs (state = initialStateTabs, action) {
   switch (action.type) {
     case CHANGE_TAB:
-      return action.tab
+      return {
+        ...state,
+        tab: action.tab,
+        searchQuery: ''
+      }
+    case CHANGE_SEARCH_QUERY:
+      return {
+        ...state,
+        searchQuery: action.searchQuery
+      }
+    case CHANGE_PAGE:
+      return {
+        ...state,
+        page: action.page
+      }
     default:
       return state
   }

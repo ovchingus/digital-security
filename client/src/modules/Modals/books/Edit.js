@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import get from 'lodash/get'
 import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 import { updateBook } from '../../../flux/actions'
 
