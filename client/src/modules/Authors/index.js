@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Table, Button, Input } from 'semantic-ui-react'
+import { Table, Button, Input, Pagination } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
 import includes from 'lodash/includes'
 import omit from 'lodash/omit'
@@ -24,6 +24,11 @@ function Authors ({
   }, [])
 
   const [data, setData] = useState(authors)
+
+  /**
+   * Sorting
+   */
+
   const [sort, setSort] = useState({ direction: null, column: null })
 
   const handleSort = (clickedColumn) => () => {
@@ -36,12 +41,19 @@ function Authors ({
       return
     }
     setData(data.reverse())
-    setSort(sort.direction === 'ascending' ? 'descending' : 'ascending')
+    setSort({
+      ...sort,
+      direction: sort.direction === 'ascending' ? 'descending' : 'ascending'
+    })
   }
 
   function useSort (cellName) {
     return cellName === sort.column ? sort.direction : null
   }
+
+  /**
+   * Searching
+   */
 
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
 
@@ -65,6 +77,28 @@ function Authors ({
     }
     setSearchQuery(value)
   }
+
+  /**
+   * Pagination
+   */
+
+  const authorsOnPage = 8
+  const pagesCount = Math.ceil(data.length / authorsOnPage)
+  const [page, setPage] = useState(1)
+
+  function getPageData (activePage) {
+    return data.slice(
+      (activePage - 1) * authorsOnPage,
+      activePage * authorsOnPage
+    )
+  }
+
+  function handleChangePage (e, { activePage }) {
+    setPage(activePage)
+  }
+
+  const isLastPage = page === pagesCount
+  const mockForLastPage = Array(pagesCount * authorsOnPage - data.length).fill(1)
 
   return (
     <div>
@@ -122,7 +156,41 @@ function Authors ({
               </Table.Cell>
             </Table.Row>
           ))}
+          {isLastPage &&
+          mockForLastPage.map((author, idx) => (
+            <Table.Row key={idx}>
+              <Table.Cell>
+                <Button
+                  icon='remove'
+                  disabled
+                />
+                <Button
+                  icon='edit'
+                  disabled
+                />
+                <Button
+                  icon='info'
+                  disabled
+                />
+              </Table.Cell>
+              <Table.Cell />
+              <Table.Cell />
+            </Table.Row>
+          ))}
         </Table.Body>
+        <Table.Footer>
+          <Table.Row>
+            <Table.HeaderCell colSpan='3'>
+              <Pagination
+                firstItem={null}
+                lastItem={null}
+                activePage={page}
+                onPageChange={handleChangePage}
+                totalPages={pagesCount}
+              />
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer>
       </Table>
     </div>
   )

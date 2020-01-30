@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { connect } from 'react-redux'
-import { Table, Button, Input, Rating } from 'semantic-ui-react'
+import { Table, Button, Input, Rating, Pagination } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
 import includes from 'lodash/includes'
-import omit from 'lodash/omit'
 import { deleteBook } from '../../flux/actions'
 import Modal from '../Modals'
 
@@ -23,6 +22,11 @@ function Books ({
   }, [])
 
   const [data, setData] = useState(books)
+
+  /**
+   * Sorting
+   */
+
   const [sort, setSort] = useState({ direction: null, column: null })
 
   const handleSort = (clickedColumn) => () => {
@@ -35,12 +39,19 @@ function Books ({
       return
     }
     setData(data.reverse())
-    setSort(sort.direction === 'ascending' ? 'descending' : 'ascending')
+    setSort({
+      ...sort,
+      direction: sort.direction === 'ascending' ? 'descending' : 'ascending'
+    })
   }
 
   function useSort (cellName) {
     return cellName === sort.column ? sort.direction : null
   }
+
+  /**
+   * Searching
+   */
 
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
 
@@ -68,6 +79,28 @@ function Books ({
     }
     setSearchQuery(value)
   }
+
+  /**
+   * Pagination
+   */
+
+  const booksOnPage = 8
+  const pagesCount = Math.ceil(data.length / booksOnPage)
+  const [page, setPage] = useState(1)
+
+  function getPageData (activePage) {
+    return data.slice(
+      (activePage - 1) * booksOnPage,
+      activePage * booksOnPage
+    )
+  }
+
+  function handleChangePage (e, { activePage }) {
+    setPage(activePage)
+  }
+
+  const isLastPage = page === pagesCount
+  const mockForLastPage = Array(pagesCount * booksOnPage - data.length).fill(1)
 
   return (
     <div>
@@ -118,7 +151,7 @@ function Books ({
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.map(book => (
+          {getPageData(page).map(book => (
             <Table.Row key={book.book_id}>
               <Table.Cell collapsing>
                 <Button
@@ -148,7 +181,43 @@ function Books ({
               </Table.Cell>
             </Table.Row>
           ))}
+          {isLastPage &&
+          mockForLastPage.map((book, idx) => (
+            <Table.Row key={idx}>
+              <Table.Cell>
+                <Button
+                  icon='remove'
+                  disabled
+                />
+                <Button
+                  icon='edit'
+                  disabled
+                />
+                <Button
+                  icon='info'
+                  disabled
+                />
+              </Table.Cell>
+              <Table.Cell />
+              <Table.Cell />
+              <Table.Cell />
+              <Table.Cell />
+            </Table.Row>
+          ))}
         </Table.Body>
+        <Table.Footer>
+          <Table.Row>
+            <Table.HeaderCell colSpan='5'>
+              <Pagination
+                firstItem={null}
+                lastItem={null}
+                activePage={page}
+                onPageChange={handleChangePage}
+                totalPages={pagesCount}
+              />
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer>
       </Table>
     </div>
   )
