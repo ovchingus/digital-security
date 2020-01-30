@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Table, Button, Input, Rating } from 'semantic-ui-react'
-import _ from 'lodash'
+import sortBy from 'lodash/sortBy'
+import includes from 'lodash/includes'
+import omit from 'lodash/omit'
 import { deleteBook } from '../../flux/actions'
 import Modal from '../Modals'
 
 function Books ({
   books,
-  deleteBook
+  deleteBook,
+  initialSearchQuery
 }) {
   useEffect(() => {
     setData(books)
   }, [books])
+
+  useEffect(() => {
+    if (initialSearchQuery !== '') {
+      handleSearch()
+    }
+  }, [])
 
   const [data, setData] = useState(books)
   const [sort, setSort] = useState({ direction: null, column: null })
@@ -22,7 +31,7 @@ function Books ({
         direction: 'ascending',
         column: clickedColumn
       })
-      setData(_.sortBy(data, [clickedColumn]))
+      setData(sortBy(data, [clickedColumn]))
       return
     }
     setData(data.reverse())
@@ -33,17 +42,31 @@ function Books ({
     return cellName === sort.column ? sort.direction : null
   }
 
-  function handleSearch (e, { value }) {
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+
+  function handleSearch () {
     const newData = []
-    for (const book of data) {
-      for (const objVal of Object.values(book)) {
-        if (_.includes(objVal, value)) {
+    for (const book of books) {
+      const validFields = {
+        title: book.title,
+        author: book.author.name,
+        genre: book.genre
+      }
+      for (const objVal of Object.values(validFields)) {
+        if (includes(objVal.toLowerCase(), searchQuery.toLowerCase())) {
           newData.push(book)
           break
         }
       }
     }
-    value.length > 0 ? setData(newData) : setData(books)
+    setData(newData)
+  }
+
+  function handleSearchChange (e, { value }) {
+    if (value === '') {
+      setData(books)
+    }
+    setSearchQuery(value)
   }
 
   return (
@@ -54,9 +77,13 @@ function Books ({
             <Table.HeaderCell colSpan='5'>
               <Modal.AddBook />
               <Input
-                icon='search'
+                action={{
+                  icon: 'search',
+                  onClick: () => handleSearch()
+                }}
                 placeholder='Поиск...'
-                onChange={handleSearch}
+                value={searchQuery}
+                onChange={handleSearchChange}
               />
             </Table.HeaderCell>
           </Table.Row>
@@ -128,7 +155,8 @@ function Books ({
 }
 
 const mapStateToProps = state => ({
-  books: state.books
+  books: state.books,
+  initialSearchQuery: state.tabs.searchQuery
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -47,7 +47,7 @@ function Authors ({
 
   function handleSearch () {
     const newData = []
-    for (const author of data) {
+    for (const author of authors) {
       const validFields = omit(author, 'author_id')
       for (const objVal of Object.values(validFields)) {
         if (includes(objVal.toLowerCase(), searchQuery.toLowerCase())) {
@@ -56,7 +56,14 @@ function Authors ({
         }
       }
     }
-    searchQuery.length > 0 ? setData(newData) : setData(authors)
+    setData(newData)
+  }
+
+  function handleSearchChange (e, { value }) {
+    if (value === '') {
+      setData(authors)
+    }
+    setSearchQuery(value)
   }
 
   return (
@@ -73,7 +80,7 @@ function Authors ({
                 }}
                 placeholder='Поиск...'
                 value={searchQuery}
-                onChange={(e, { value }) => setSearchQuery(value)}
+                onChange={handleSearchChange}
               />
             </Table.HeaderCell>
           </Table.Row>
