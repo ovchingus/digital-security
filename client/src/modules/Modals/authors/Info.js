@@ -16,6 +16,15 @@ function Info ({ modal, author, getAuthorBooks, clearAuthorBooks }) {
     setIsOpen(true)
   }
 
+  const BooksList = modal.books.map(book => (
+    <List.Item key={book.book_id}>
+      <List.Content floated='right'>
+        <Button>Просмотр</Button>
+      </List.Content>
+      <List.Content>{book.title}</List.Content>
+    </List.Item>
+  ))
+
   return (
     <Modal
       trigger={<Button icon='info' onClick={handleOpen} />}
@@ -33,14 +42,7 @@ function Info ({ modal, author, getAuthorBooks, clearAuthorBooks }) {
         <p>{author.author_id}</p>
         <Header>Список написанных книг</Header>
         <List divided verticalAlign='middle'>
-          {modal.books.map(book => (
-            <List.Item key={book.book_id}>
-              <List.Content floated='right'>
-                <Button>Просмотр</Button>
-              </List.Content>
-              <List.Content>{book.title}</List.Content>
-            </List.Item>
-          ))}
+          {BooksList.length > 0 ? BooksList : <p>Нет книг</p>}
         </List>
       </Modal.Content>
       <Modal.Actions>
