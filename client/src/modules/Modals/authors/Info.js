@@ -1,9 +1,21 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Header, Icon, List, Modal } from 'semantic-ui-react'
-import { getAuthorBooks, clearAuthorBooks } from '../../../flux/actions'
+import {
+  getAuthorBooks,
+  clearAuthorBooks,
+  changeTab,
+  changeSearchQuery
+} from '../../../flux/actions'
 
-function Info ({ modal, author, getAuthorBooks, clearAuthorBooks }) {
+function Info ({
+  modal,
+  author,
+  getAuthorBooks,
+  moveToBooksTab,
+  setBooksSearchQuery,
+  clearAuthorBooks
+}) {
   const [isOpen, setIsOpen] = useState(false)
 
   function handleClose () {
@@ -16,10 +28,18 @@ function Info ({ modal, author, getAuthorBooks, clearAuthorBooks }) {
     setIsOpen(true)
   }
 
+  function handleBookRedirect (title) {
+    setIsOpen(false)
+    moveToBooksTab()
+    setBooksSearchQuery(title)
+  }
+
   const BooksList = modal.books.map(book => (
     <List.Item key={book.book_id}>
       <List.Content floated='right'>
-        <Button>Просмотр</Button>
+        <Button onClick={() => handleBookRedirect(book.title)}>
+          Просмотр
+        </Button>
       </List.Content>
       <List.Content>{book.title}</List.Content>
     </List.Item>
@@ -55,16 +75,16 @@ function Info ({ modal, author, getAuthorBooks, clearAuthorBooks }) {
   )
 }
 
-const mapStateToProps = (state) => ({
-  modal: state.modal
+const mapStateToProps = state => ({
+  modal: state.modal,
+  tab: state.tabs.tab
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  getAuthorBooks: (author) => dispatch(getAuthorBooks(author)),
-  clearAuthorBooks: () => dispatch(clearAuthorBooks())
+const mapDispatchToProps = dispatch => ({
+  getAuthorBooks: author => dispatch(getAuthorBooks(author)),
+  clearAuthorBooks: () => dispatch(clearAuthorBooks()),
+  moveToBooksTab: () => dispatch(changeTab(0)),
+  setBooksSearchQuery: query => dispatch(changeSearchQuery(query))
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Info)
+export default connect(mapStateToProps, mapDispatchToProps)(Info)
